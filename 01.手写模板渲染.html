@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vue的模板渲染</title>
+  <!-- <script src="./vue.js"></script> -->
+</head>
+<body>
+  <div id="root">
+    <p>{{name}}</p>
+    <span>{{message}}</span>
+  </div>
+  <script>
+    // let vm = new Vue({
+    //   el:'#root',
+    //   data:{
+    //     name:'小鹏',
+    //     message:'是一个帅哥'
+    //   }
+    // })
+
+    // 需求：实现模板渲染的功能
+    let root = document.getElementById("root")
+    root.childNodes
+    let templete = root.cloneNode(true)  //这里的克隆是为了不和原来的指向同一个对象
+    console.log(templete)
+    let data = {
+      name:"钢铁侠",
+      message:"是一个聪明的有钱人"
+    }
+    function complier(templete){
+      let children = templete.children
+      if(children && children.length > 0){
+        Array.from(children).forEach(e=>{  //将HTML类型转为数组使用foreach遍历
+          complier(e)
+        })
+      }else{ // 说明该节点是一个文本节点
+        let reg = /\{\{(.+)\}\}/g
+        templete.innerText = templete.innerText.replace(reg,(_,params)=>{ //跟据正则进行匹配
+          return data[params]
+        })
+      }
+    }
+    complier(templete)
+    while (root.firstChild) {
+      root.removeChild(root.firstChild);
+    }
+    while(templete.firstChild){
+      root.appendChild(templete.firstChild)
+    }
+  </script>
+</body>
+</html>
