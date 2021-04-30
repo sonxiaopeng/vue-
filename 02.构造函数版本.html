@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vue的模板渲染</title>
+  <!-- <script src="./vue.js"></script> -->
+  <script src="./getContentByPath.js"></script>
+</head>
+<body>
+  <div id="root">
+    <p>{{name}}</p>
+    <span>{{message}}</span>
+    <ul>
+      <li>{{obj.child}}</li>
+    </ul>
+  </div>
+  <script>
+    function Vue(options){
+      this.$el = document.querySelector(options.el)
+      this.data = options.data
+      this.render()
+    }
+
+    // 需求：实现一个vue的构造函数 能够更新模板
+    Vue.prototype.render = function (){
+      let templete = this.$el.cloneNode(true)
+      this.complier(templete)  //通过complier编译之后，此时的templete中的变量就已经被替换了
+      while (this.$el.firstChild) {
+        this.$el.removeChild(root.firstChild);
+      }
+      while(templete.firstChild){
+        this.$el.appendChild(templete.firstChild)
+      }
+    }
+    // 定义一个编译函数，可以对模板进行编译，方便渲染函数进行渲染
+    Vue.prototype.complier = function (templete){
+      let children = templete.children
+      if(children && children.length > 0){
+        Array.from(children).forEach(e=>{  //将HTML类型转为数组使用foreach遍历
+          this.complier(e)  //执行递归操作  
+        })
+      }else{ // 说明该节点是一个文本节点
+        let reg = /\{\{(.+?)\}\}/g
+        templete.innerText = templete.innerText.replace(reg,(_,params)=>{ //跟据正则进行匹配
+          let target = getContentByPath(this.data,params)  //是用解析算法进行解析将模板中已有复杂变量也可以进行解析
+          return target
+        })
+      }
+    }
+
+    let vm = new Vue({
+      el:'#root',
+      data:{
+        name:'Vue',
+        message:'手写vue',
+        obj:{
+          child:'child'
+        }
+      }
+    })
+
+   
+  </script>
+</body>
+</html>
