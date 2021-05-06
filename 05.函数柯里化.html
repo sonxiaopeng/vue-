@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    // 为什么要使用函数柯里化：一个函数传递一个参数 返回一个新的函数传递剩余的参数的变成函数称之为
+    // 1.提升效率，
+    // 案例：判断一个标签是否属于Html原生标签
+    // 方法一：不使用函数柯里化
+    let tagStr = 'a,div,ul,li,h1,h2,h3,atricle,section'
+    function findTag(tagStr,target){
+      let tagArr = tagStr.split(",")
+      let res = tagArr.find(e=>{
+        return e == target.toLowerCase()
+      })
+      return !!res
+    }
+
+    // 实验
+    console.log(findTag(tagStr,'li'))
+    // 方法二:使用函数柯里化
+    function keliFindTag(tagStr){
+      let tagArr = tagStr.split(",")
+      let mapTag = {}
+      tagArr.forEach(e => {
+        mapTag[e] = true
+      });
+      return function (target){
+        return !!mapTag[target]
+      }
+    }
+
+    // 实验
+    let checkTag = keliFindTag(tagStr)  //这个checkTag就是一个函数
+    console.log(checkTag('a'))
+    console.log(checkTag('h6'));
+
+    // 总结：两者对比
+    /*
+    *1.函数柯里化的最大的特点就是可以缓存循环结果，通过第一种方法进行计算时，每检查一次就需要循环一
+       次，检查n次，就需要循环n次，性能消耗为n 
+     2.使用函数柯里化时，我们只需要将循环执行一次就可以得到一个对象的映射关系，不管检查多少次，也都只需要
+       循环一次，其性能消耗为1，这便是函数柯里化带给我们的福利
+    */
+  </script>
+</body>
+</html>

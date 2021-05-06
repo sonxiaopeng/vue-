@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root">
+    <div>
+      <ul>
+        <li>
+          {{name}}
+        </li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    // 为什么要有虚拟DOM的概念
+    /*
+    1.在进行模板渲染时如果不使用虚拟DOM ，那么就是对已有的真实DOM进行替换删除和进行DOM操作，可真实DOM实际上是一个巨大的对象，对其进行操作无论时查找
+      还是其他操作都会消耗性能，而实际上我们仅仅只是想替换和操作真实DOM中的某个别关心的数据，对整个真实DOM进行操作无疑是有点大材小用了，杀鸡焉用宰牛刀
+    2. 用就是对象来模拟dom元素和嵌套关系
+    */
+    class VNode {
+      constructor(tag,value,attr,type){  //attr:{id:'ID值',class:'类名'  ...  }
+        this.tag = tag
+        this.value = value
+        this.attr = attr
+        this.type = type
+        this.children = []
+      }
+      createNode(){  //这个函数的作用是将虚拟DOM转化为真实的DOM
+        let node = document.createElement(this.tag)
+        if(this.type == 3){
+          return this.value
+        }
+        for(var key in this.attr){
+          node.setAttribute(key,this.attr[key])
+        }
+        this.children.forEach(e=>{
+          let childNode = this.createNode(e)  //对每一个子虚拟DOM节点进行递归操作
+          node.appendChild(childNode)
+        })
+        node.innerText = this.value
+        return node
+      }
+      appendChild(children){
+        this.children = children
+      }
+      // 将真实DOM转化为虚拟DOM 
+    }
+
+
+    
+    let a = document.getElementById("root")
+    let div = new VNode('div','我是value',{id:'box',class:'head'},1)
+    console.log(div)
+  </script>
+</body>
+</html>

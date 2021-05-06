@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    // 手写事件对象模型
+    // 需求：定义一个事件模型对象 要求有三个api emit on off  
+    // 当使用event.on时属于订阅一个函数，注册在事件模型身上，
+    // 当使用event.off时属于注销一个事件，
+    // 当使用event.emit时属于发布一个事件，执行提前注册好的函数
+    // 为了方便调试，在全局注册一个eventObj容器
+    let eventObj
+    let event = (function (){
+      eventObj = {}  //默认情况下为一个空的对象
+      return {
+        on:(name,handler)=>{
+          // 使用event.on时等价于往eventObj中注册一个函数
+          // (eventObj[name] || eventObj[name]  = []).push(handler)
+          if(!eventObj[name]){
+            (eventObj[name] = []).push(handler)
+          }else{
+            eventObj[name].push(handler)
+          }
+        },
+        off:(name,handler)=>{
+          if(arguments.length == 0){
+            // 说明一个参数都没有
+            eventObj = {}
+          }else if(arguments.length == 1 ){
+            // 说明清除掉这个事件名下的所有订阅函数
+            eventObj[name] = []
+          }else{
+            // 清除掉这个name下固定的订阅
+            for(var i=eventObj[name].length -1;i>=0;i--){
+              // 倒序循环为了不改变顺序
+              if(handler == eventObj[name][i]){
+                eventObj[name].splice(i,1)
+              }
+            }
+          }
+        },
+        emit:(name,...args)=>{
+          let fnArr = eventObj[name]
+          for(var i=0;i<fnArr.length;i++){
+            fnArr[i](...args)
+          }
+        }
+      }
+    })()
+  </script>
+</body>
+</html>

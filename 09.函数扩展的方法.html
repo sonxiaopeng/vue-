@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function fun(){
+      console.log('我是函数原本的功能')
+    }
+
+    // 需求扩展函数的功能，要求保留原函数的情况下
+    let tmp = fun  //将fun 暂时在tmp中保存
+    // 重写fun函数
+    fun = function(){
+      console.log('我是函数的扩展功能')
+      tmp()
+    }
+  
+    fun()
+    //此时便实现了函数的扩展的功能
+  </script>
+</body>
+</html>

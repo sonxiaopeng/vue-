@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    let data = {
+      name:'小鹏',
+      course:[
+        {name:'语文'},
+        {name:'数学'},
+        {name:'英语'},
+      ],
+      tool:{music:'guiter'}
+    }
+    // 此时data中的数组如果加上一个数据就不是响应式了 ， 需要通过重写数组中的 push splice sort ...等方法
+    // 思路：改变数组的原型链继承方式
+    // 目标数组 --> interceptor -->  Array.prototype   --> Object.prototype
+    let interceptor = Object.create(Array.prototype)  //让interceptor 继承自Array.prototype
+    
+    let methods = ['push','pop','shift','unshift','splice']
+    methods.forEach(e=>{
+      interceptor[e] = function (){
+        console.log("我使用一下继承")
+        for(var i=0;i<arguments.length;i++){
+          reactify(arguments[i])
+        }
+        return Array.prototype[e].apply(this,arguments)
+      }
+    })
+
+    // 需求：对数组和对象实现深度响应 数组增加可以实现响应
+    // 响应函数
+    function defineReactive(obj,key,value,enumerable){ 
+      Object.defineProperty(obj,key,{
+        enumerable:!!enumerable,
+        get(){
+          console.log(`取值时会触发:我的值为${value}`)
+          return value
+        },
+        set(newVal){
+          console.log(`赋值时会触发，赋值为${newVal}`)
+          value = newVal
+        }
+      })
+    } 
+    //使用递归的思想
+    function reactify(data){
+      for(var key in data){
+        let value = data[key]
+        // 对data进行判断  三中情况 数组 对象 普通值
+        if(typeof value !== 'object' ){ //是一个普通的值
+          defineReactive(data,key,value,true)
+        }else if(Array.isArray(value)){  //这是一个数组  让其继承interceptor
+          value.__proto__ = interceptor
+          value.forEach(e=>{
+            reactify(e)
+          })
+        }else{  //这是一个对象
+          reactify(value)
+        }
+      }
+    } 
+
+    reactify(data)
+
+    // 今后目标数组只要使用其上的五种方法就等价于继承Interceptor中的方法，可以拦截
+    // 我们可以在拦截器里面给arguments添加响应式
+  </script>
+</body>
+</html>

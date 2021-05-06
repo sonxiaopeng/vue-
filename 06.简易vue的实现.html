@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="./myvue.js"></script>
+</head>
+<body>
+  <div id="root">
+    <div>{{name}}</div>
+    <ul>
+      <li>{{age}}</li>
+    </ul>
+  </div>
+  <script>
+    let vm = new Vue({
+      el:'#root',
+      data:{
+        name:'小彭',
+        age:'是个帅哥'
+      }
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    // 在Vue中只要我们访问vm.name  等价于我们访问 vm.data.name  如何做到的
+    // 通过将data中的所有属性映射到实例上
+    // 定义一个proxy函数
+    
+    // 1.案例  要将o1的属性映射到o2上
+    let o1 = {name:"xiaopeg"}
+    let o2 = {}
+
+    function proxy1(vm,data,key){  //vm指映射的实例对象，data指的是将哪个对象进行映射 key要映射哪个属性
+      Object.defineProperty(vm,key,{
+        configurable:true,
+        enumerable:true,
+        get(){
+          console.log(`我要将${data.toString()}中的${key}属性映射`)
+          return data[key]  //当我们在访问
+        },
+        set(newVal){
+          console.log(`实际上我改变的是 ${data}中的${key}`)
+          data[key] = newVal
+        }
+      })
+    }
+
+    proxy1(o2,o1,'name')
+
+    // o2.name
+    // 我要将[object Object]中的name属性映射
+    // "xiaopeg"
+    // 02.name = "asdf"
+    // "asdf"
+    // o2.name = "asdfasd"
+    // 实际上我改变的是 [object Object]中的name
+    // "asdfasd"
+    // o2.name = 'asdf'
+    // 实际上我改变的是 [object Object]中的name
+    // "asdf"
+    // console.log(o2)
+    // VM168:1 {}name: (...)
+    // console.log(o1)
+    // VM201:1 {name: "asdf"}
+
+    // 在vue中它其实也是这么做的 甚至有的时候不仅仅希望将data的属性进行映射，其他属性的之也希望进行映射
+    function proxy2(target,prop,key){  //vm指映射的实例对象，data指的是将哪个对象进行映射 key要映射哪个属性
+      Object.defineProperty(vm,key,{
+        configurable:true,
+        enumerable:true,
+        get(){
+          console.log(`我要将${data.toString()}中的${key}属性映射`)
+          return target[prop][key]  //当我们在访问
+        },
+        set(newVal){
+          console.log(`实际上我改变的是 ${data}中的${key}`)
+          target[prop][key] = newVal
+        }
+      })
+    }
+
+    // 就形成了以上的格局
+  </script>
+</body>
+</html>

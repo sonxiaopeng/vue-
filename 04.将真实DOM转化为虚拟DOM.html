@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root">
+    <div>
+      <ul>
+        <li>
+          小鹏
+        </li>
+      </ul>
+    </div>
+    <ul>
+      <li>帅哥</li>
+    </ul>
+  </div>
+  <script>
+    class VNode {
+      constructor(tag,value,attr,type){  //attr:{id:'ID值',class:'类名'  ...  }
+        this.tag = tag
+        this.value = value
+        this.attr = attr
+        this.type = type
+        this.children = []
+      }
+      appendChild(children){
+        this.children.push(children)
+      }
+    }
+    let root = document.getElementById("root") 
+    // 需求  将root 转化为虚拟DOM
+    // 1.创建一个实例化虚拟DOM的函数
+    function createVNode(tag,value,attr,type){
+      return new VNode(tag,value,attr,type)
+    }
+    // 2.对root进行分析和递归判断
+    function makeVNode(element){
+        // if(element)
+        let children = element.childNodes
+        let tag = element.nodeName && element.nodeName.toLowerCase()
+        let type = element.nodeType
+        let value = type == 3 ? element.nodeValue.trim() : undefined
+        let attr
+        if(type == 1){
+          attr = {}
+          let attrs = element.attributes
+          for(var i=0;i<attrs.length;i++){
+            attr[attrs[i].nodeName] = attrs[i].value
+          }
+        }else {
+          attr = undefined
+        }
+        let VNode = createVNode(tag,value,attr,type)  //获取一个元素节点的属性
+        if(children && children.length>0){  //当这个元素有子元素时
+          for(var i=0;i<children.length;i++){
+            VNode.appendChild(makeVNode(children[i]))
+          }
+        }
+        return VNode
+        // return children
+    }
+    console.log(makeVNode(root))
+  </script>
+</body>
+</html>

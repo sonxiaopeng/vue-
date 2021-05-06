@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    // 在vue当中是通过Object.defineProperity()方法实现相应式的具体如下
+
+    let data = {}
+    // 需求：当data中的属性发生变化时，会触发一段逻辑
+    Object.defineProperty(data,'name',{
+      writable:false,  //控制改属性是否只读
+      enumerable:true,  //控制该属性是否可枚举
+      configurable:true,  //双保险开关
+      value:'小鹏',
+      // get(){
+      //   console.log(`取值时会触发:我的值为${value}`)
+      //   return value
+      // },
+      // set(newVal){
+      //   console.log(`赋值时会触发，赋值为${newVal}`)
+      //   value = newVal
+      // }
+    })
+    //  温馨提示:忽略console的情况下以上的做法在逻辑上与 data.name = "小鹏"  其实是一样的
+    // 在vue当中是使用一个闭包函数的形式进行设置的  这是为了缓存一个中间变量，用来保护真正的变量
+    function defineReactive(obj,key,value,enumerable){ 
+      Object.defineProperty(obj,key,{
+        enumerable:!!enumerable,
+        get(){
+          console.log(`取值时会触发:我的值为${value}`)
+          return value
+        },
+        set(newVal){
+          console.log(`赋值时会触发，赋值为${newVal}`)
+          value = newVal
+        }
+      })
+    } 
+
+    // 当我们写下一个响应式对象时
+    data = { name:'小鹏',age:'20' }
+    for(var key in data){
+      defineReactive(data,key,data[key],true)
+    }
+  </script>
+</body>
+</html>

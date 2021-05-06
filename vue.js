@@ -292,6 +292,7 @@
   /**
    * Check if two values are loosely equal - that is,
    * if they are plain objects, do they have the same shape?
+   * 判断一个对象和另一个对象在形式上是否完全一样；
    */
   function looseEqual (a, b) {
     if (a === b) { return true }
@@ -734,7 +735,7 @@
 
   Dep.prototype.notify = function notify () {
     // stabilize the subscriber list first
-    var subs = this.subs.slice();
+    var subs = this.subs.slice();  //克隆一份watcher 
     if (!config.async) {
       // subs aren't sorted in scheduler if not running async
       // we need to sort them now to make sure they fire in correct
@@ -742,6 +743,7 @@
       subs.sort(function (a, b) { return a.id - b.id; });
     }
     for (var i = 0, l = subs.length; i < l; i++) {
+      // 将sub中的每一个watcher的update方法都进行执行
       subs[i].update();
     }
   };
@@ -1039,7 +1041,7 @@
       get: function reactiveGetter () {
         var value = getter ? getter.call(obj) : val;
         if (Dep.target) {
-          dep.depend();
+          dep.depend();  //进行依赖收集 将该属性的 dep中的subs数组容器中添加Dep.target的watcher
           if (childOb) {
             childOb.dep.depend();
             if (Array.isArray(value)) {
@@ -1056,6 +1058,7 @@
           return
         }
         /* eslint-enable no-self-compare */
+        // 如果有自定义的函数比如computed 以及 watch中的函数 ，就会在这里进行执行
         if (customSetter) {
           customSetter();
         }
@@ -1067,7 +1070,7 @@
           val = newVal;
         }
         childOb = !shallow && observe(newVal);
-        dep.notify();
+        dep.notify();  //这个是和兴会调用dep中的notify函数意味着通知也就是会通知观察者你要进行更新啦
       }
     });
   }
@@ -3341,7 +3344,7 @@
 
   // wrapper function for providing a more flexible interface
   // without getting yelled at by flow
-  function createElement (
+  function createElement (  //就是把虚拟DOM或者DOM特征变为一个真正的DOM节点
     context,
     tag,
     data,
